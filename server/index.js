@@ -57,7 +57,12 @@ function escapeHtml(str) { return str.replace(/[&<>'"]/g, c => ({'&':'&amp;','<'
 
 if (require('fs').existsSync(CLIENT_DIST)) {
   app.use(express.static(CLIENT_DIST));
-  app.get('*', (req, res, next) => req.path.startsWith('/api/') ? next() : res.sendFile(path.join(CLIENT_DIST, 'index.html')));
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api/')) {
+      return res.sendFile(path.join(CLIENT_DIST, 'index.html'));
+    }
+    next();
+  });
 }
 
 app.listen(PORT, () => console.log(`Scorpy Tech server running on http://localhost:${PORT}`));
